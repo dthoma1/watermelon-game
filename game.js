@@ -100,7 +100,17 @@ const dpr = window.devicePixelRatio || 1;
 let W, H;
 const WALL_THICKNESS = 20;
 const CONTAINER_MARGIN = 14;
+let CONTAINER_BOTTOM_MARGIN = 14;
 let DANGER_Y;
+
+function getSafeAreaBottom() {
+  const div = document.createElement("div");
+  div.style.paddingBottom = "env(safe-area-inset-bottom)";
+  document.body.appendChild(div);
+  const val = parseInt(getComputedStyle(div).paddingBottom) || 0;
+  document.body.removeChild(div);
+  return val;
+}
 
 function resize() {
   W = window.innerWidth;
@@ -109,6 +119,7 @@ function resize() {
   canvas.height = H * dpr;
   canvas.style.width = W + "px";
   canvas.style.height = H + "px";
+  CONTAINER_BOTTOM_MARGIN = Math.max(14, getSafeAreaBottom() + 8);
   DANGER_Y = H * 0.18;
 }
 resize();
@@ -123,8 +134,7 @@ function createWalls() {
   const containerTop = H * 0.15;
   const containerLeft = CONTAINER_MARGIN;
   const containerRight = W - CONTAINER_MARGIN;
-  const containerBottom = H - CONTAINER_MARGIN;
-
+  const containerBottom = H - CONTAINER_BOTTOM_MARGIN;
   const wallOptions = {
     isStatic: true,
     friction: 0.8,
@@ -475,8 +485,7 @@ function drawContainer() {
   const top = H * 0.15;
   const left = CONTAINER_MARGIN;
   const right = W - CONTAINER_MARGIN;
-  const bottom = H - CONTAINER_MARGIN;
-  const radius = 18;
+  const bottom = H - CONTAINER_BOTTOM_MARGIN;  const radius = 18;
 
   // Container background with soft fill
   ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
@@ -546,7 +555,7 @@ function drawPreview() {
   ctx.setLineDash([3, 6]);
   ctx.beginPath();
   ctx.moveTo(dropX, dropY + radius);
-  ctx.lineTo(dropX, H - CONTAINER_MARGIN);
+  ctx.lineTo(dropX, H - CONTAINER_BOTTOM_MARGIN);
   ctx.stroke();
   ctx.setLineDash([]);
 
