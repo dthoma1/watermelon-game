@@ -6,6 +6,6 @@
   "scope": "/watermelon-game/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1a0a2e",
-  "theme_color": "#1a0a2e"
+  "background_color": "#fce4ec",
+  "theme_color": "#ff8fab"
 }
