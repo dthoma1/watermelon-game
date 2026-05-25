@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Watermelon">
+  <title>🍉 Watermelon Merge</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+  <div id="score-display">Score: 0</div>
+  <div id="next-fruit"></div>
+  <div id="game-over-screen" class="hidden">
+    <div class="game-over-content">
+      <h1>Game Over!</h1>
+      <p id="final-score">Score: 0</p>
+      <button id="restart-btn">Play Again 🍉</button>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

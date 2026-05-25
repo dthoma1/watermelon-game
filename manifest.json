@@ -1,0 +1,10 @@
+{
+  "name": "Watermelon Merge",
+  "short_name": "Watermelon",
+  "description": "A fun fruit merging game!",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a0a2e",
+  "theme_color": "#1a0a2e"
+}

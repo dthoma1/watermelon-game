@@ -1,0 +1,96 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  background: #1a0a2e;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#score-display {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  z-index: 10;
+  pointer-events: none;
+}
+
+#next-fruit {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  color: #fff;
+  font-size: 18px;
+  z-index: 10;
+  pointer-events: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 4px 12px;
+  backdrop-filter: blur(8px);
+}
+
+#game-over-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(6px);
+}
+
+#game-over-screen.hidden {
+  display: none;
+}
+
+.game-over-content {
+  text-align: center;
+  color: #fff;
+}
+
+.game-over-content h1 {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.game-over-content p {
+  font-size: 28px;
+  margin-bottom: 24px;
+  opacity: 0.9;
+}
+
+#restart-btn {
+  font-size: 22px;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #43e97b, #38f9d7);
+  color: #1a0a2e;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(67, 233, 123, 0.4);
+}
+
+#restart-btn:active {
+  transform: scale(0.95);
+}
