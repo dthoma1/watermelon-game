@@ -101,13 +101,24 @@ let W, H;
 const WALL_THICKNESS = 20;
 const CONTAINER_MARGIN = 14;
 let CONTAINER_BOTTOM_MARGIN = 14;
+let CONTAINER_TOP; // computed in resize
 let DANGER_Y;
+let DROP_Y; // where the preview fruit sits
 
 function getSafeAreaBottom() {
   const div = document.createElement("div");
   div.style.paddingBottom = "env(safe-area-inset-bottom)";
   document.body.appendChild(div);
   const val = parseInt(getComputedStyle(div).paddingBottom) || 0;
+  document.body.removeChild(div);
+  return val;
+}
+
+function getSafeAreaTop() {
+  const div = document.createElement("div");
+  div.style.paddingTop = "env(safe-area-inset-top)";
+  document.body.appendChild(div);
+  const val = parseInt(getComputedStyle(div).paddingTop) || 0;
   document.body.removeChild(div);
   return val;
 }
@@ -120,7 +131,11 @@ function resize() {
   canvas.style.width = W + "px";
   canvas.style.height = H + "px";
   CONTAINER_BOTTOM_MARGIN = Math.max(14, getSafeAreaBottom() + 8);
-  DANGER_Y = H * 0.18;
+  // Leave room for score/next-fruit UI: safe area top + UI height + gap
+  const topInset = getSafeAreaTop();
+  CONTAINER_TOP = topInset + 52;
+  DROP_Y = CONTAINER_TOP - 20;
+  DANGER_Y = CONTAINER_TOP + 18;
 }
 resize();
 window.addEventListener("resize", resize);
@@ -131,7 +146,7 @@ const engine = Engine.create({
 });
 
 function createWalls() {
-  const containerTop = H * 0.15;
+  const containerTop = CONTAINER_TOP;
   const containerLeft = CONTAINER_MARGIN;
   const containerRight = W - CONTAINER_MARGIN;
   const containerBottom = H - CONTAINER_BOTTOM_MARGIN;
@@ -196,7 +211,7 @@ function dropFruit() {
     CONTAINER_MARGIN + FRUITS[currentFruitIndex][2] + 5,
     Math.min(pointerX, W - CONTAINER_MARGIN - FRUITS[currentFruitIndex][2] - 5)
   );
-  const dropY = H * 0.12;
+  const dropY = DROP_Y;
 
   const fruit = createFruit(dropX, dropY, currentFruitIndex);
   Composite.add(engine.world, fruit);
@@ -482,7 +497,7 @@ function drawBackground() {
 }
 
 function drawContainer() {
-  const top = H * 0.15;
+  const top = CONTAINER_TOP;
   const left = CONTAINER_MARGIN;
   const right = W - CONTAINER_MARGIN;
   const bottom = H - CONTAINER_BOTTOM_MARGIN;  const radius = 18;
@@ -547,8 +562,7 @@ function drawPreview() {
     CONTAINER_MARGIN + radius + 5,
     Math.min(pointerX || W / 2, W - CONTAINER_MARGIN - radius - 5)
   );
-  const dropY = H * 0.12;
-
+  const dropY = DROP_Y;
   // Cute dotted guide line
   ctx.strokeStyle = "rgba(255, 182, 193, 0.3)";
   ctx.lineWidth = 1.5;
