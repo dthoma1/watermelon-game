@@ -143,11 +143,14 @@ function resize() {
   canvas.style.height = H + "px";
 
   const insets = getSafeInsets();
-  CONTAINER_BOTTOM_MARGIN = insets.bottom + 10;
-  // Container starts below: safe area + score UI (~40px) + gap
-  CONTAINER_TOP = insets.top + 48;
-  DROP_Y = CONTAINER_TOP - 18;
-  DANGER_Y = CONTAINER_TOP + 20;
+  CONTAINER_BOTTOM_MARGIN = insets.bottom + 20;
+  // Score UI is ~40px tall, sits at insets.top
+  // Container starts well below the UI
+  CONTAINER_TOP = insets.top + 56;
+  // Drop preview sits just inside the top of the container
+  DROP_Y = CONTAINER_TOP + 30;
+  // Danger line below the drop zone
+  DANGER_Y = CONTAINER_TOP + 60;
 }
 resize();
 window.addEventListener("resize", resize);
