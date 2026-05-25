@@ -80,7 +80,7 @@ initClouds();
 // --- Game State ---
 let score = 0;
 let gameOver = false;
-let canDrop = true;
+let canDrop = false; // starts false until walls are ready
 let dropCooldown = 500;
 let currentFruitIndex = randomSmallFruit();
 let nextFruitIndex = randomSmallFruit();
@@ -105,34 +105,22 @@ let CONTAINER_TOP;
 let DANGER_Y;
 let DROP_Y;
 
-// Persistent measurement divs for safe area (more reliable than create/remove)
-const _safeTop = document.createElement("div");
-_safeTop.style.cssText = "position:fixed;top:0;left:0;width:0;padding-top:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none";
-document.body.appendChild(_safeTop);
-
-const _safeBottom = document.createElement("div");
-_safeBottom.style.cssText = "position:fixed;bottom:0;left:0;width:0;padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none";
-document.body.appendChild(_safeBottom);
-
+// Safe area detection - simplified and robust
 function getSafeInsets() {
-  let top = parseInt(getComputedStyle(_safeTop).paddingTop) || 0;
-  let bottom = parseInt(getComputedStyle(_safeBottom).paddingBottom) || 0;
-
-  // Fallback for standalone PWA mode where env() may return 0
   const isStandalone = window.navigator.standalone === true ||
     window.matchMedia("(display-mode: standalone)").matches;
 
-  if (isStandalone && top === 0) {
-    // iPhone Dynamic Island ~59px, notch ~47px, older ~20px
-    // Use 59 as safe default for modern iPhones
-    top = 59;
+  if (isStandalone) {
+    // Hardcoded safe values for modern iPhones in standalone mode
+    // iPhone 16 Pro Dynamic Island = 59px, home indicator = 34px
+    return { top: 59, bottom: 34 };
   }
-  if (isStandalone && bottom === 0) {
-    // Home indicator bar ~34px
-    bottom = 34;
-  }
-  return { top, bottom };
+
+  // In Safari, the browser handles safe areas — use minimal margins
+  return { top: 0, bottom: 0 };
 }
+
+let wallBodies = [];
 
 function resize() {
   W = window.innerWidth;
@@ -143,13 +131,9 @@ function resize() {
   canvas.style.height = H + "px";
 
   const insets = getSafeInsets();
-  CONTAINER_BOTTOM_MARGIN = insets.bottom + 20;
-  // Score UI is ~40px tall, sits at insets.top
-  // Container starts well below the UI
-  CONTAINER_TOP = insets.top + 56;
-  // Drop preview sits just inside the top of the container
+  CONTAINER_BOTTOM_MARGIN = Math.max(20, insets.bottom + 20);
+  CONTAINER_TOP = Math.max(56, insets.top + 56);
   DROP_Y = CONTAINER_TOP + 30;
-  // Danger line below the drop zone
   DANGER_Y = CONTAINER_TOP + 60;
 }
 resize();
@@ -161,6 +145,11 @@ const engine = Engine.create({
 });
 
 function createWalls() {
+  // Remove old walls if rebuilding
+  for (const w of wallBodies) {
+    Composite.remove(engine.world, w);
+  }
+
   const containerTop = CONTAINER_TOP;
   const containerLeft = CONTAINER_MARGIN;
   const containerRight = W - CONTAINER_MARGIN;
@@ -185,9 +174,11 @@ function createWalls() {
     WALL_THICKNESS, containerBottom - containerTop + WALL_THICKNESS, wallOptions
   );
 
-  Composite.add(engine.world, [floor, leftWall, rightWall]);
+  wallBodies = [floor, leftWall, rightWall];
+  Composite.add(engine.world, wallBodies);
 }
-createWalls();
+// Defer wall creation to ensure layout has settled
+setTimeout(() => { createWalls(); canDrop = true; }, 100);
 
 // --- Fruit Creation ---
 function randomSmallFruit() {
@@ -444,6 +435,8 @@ function restartGame() {
   currentFruitIndex = randomSmallFruit();
   nextFruitIndex = randomSmallFruit();
 
+  resize();
+  createWalls();
   updateScoreDisplay();
   updateNextFruitDisplay();
   document.getElementById("game-over-screen").classList.add("hidden");
