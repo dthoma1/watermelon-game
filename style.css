@@ -23,7 +23,7 @@ html, body {
 
 #score-display {
   position: fixed;
-  top: max(12px, env(safe-area-inset-top));
+  top: max(16px, env(safe-area-inset-top, 59px));
   left: 50%;
   transform: translateX(-50%);
   color: #fff;
@@ -42,7 +42,7 @@ html, body {
 
 #next-fruit {
   position: fixed;
-  top: max(12px, env(safe-area-inset-top));
+  top: max(16px, env(safe-area-inset-top, 59px));
   right: max(16px, env(safe-area-inset-right));
   color: #fff;
   font-size: 16px;

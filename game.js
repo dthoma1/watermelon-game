@@ -101,26 +101,37 @@ let W, H;
 const WALL_THICKNESS = 20;
 const CONTAINER_MARGIN = 14;
 let CONTAINER_BOTTOM_MARGIN = 14;
-let CONTAINER_TOP; // computed in resize
+let CONTAINER_TOP;
 let DANGER_Y;
-let DROP_Y; // where the preview fruit sits
+let DROP_Y;
 
-function getSafeAreaBottom() {
-  const div = document.createElement("div");
-  div.style.paddingBottom = "env(safe-area-inset-bottom)";
-  document.body.appendChild(div);
-  const val = parseInt(getComputedStyle(div).paddingBottom) || 0;
-  document.body.removeChild(div);
-  return val;
-}
+// Persistent measurement divs for safe area (more reliable than create/remove)
+const _safeTop = document.createElement("div");
+_safeTop.style.cssText = "position:fixed;top:0;left:0;width:0;padding-top:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none";
+document.body.appendChild(_safeTop);
 
-function getSafeAreaTop() {
-  const div = document.createElement("div");
-  div.style.paddingTop = "env(safe-area-inset-top)";
-  document.body.appendChild(div);
-  const val = parseInt(getComputedStyle(div).paddingTop) || 0;
-  document.body.removeChild(div);
-  return val;
+const _safeBottom = document.createElement("div");
+_safeBottom.style.cssText = "position:fixed;bottom:0;left:0;width:0;padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none";
+document.body.appendChild(_safeBottom);
+
+function getSafeInsets() {
+  let top = parseInt(getComputedStyle(_safeTop).paddingTop) || 0;
+  let bottom = parseInt(getComputedStyle(_safeBottom).paddingBottom) || 0;
+
+  // Fallback for standalone PWA mode where env() may return 0
+  const isStandalone = window.navigator.standalone === true ||
+    window.matchMedia("(display-mode: standalone)").matches;
+
+  if (isStandalone && top === 0) {
+    // iPhone Dynamic Island ~59px, notch ~47px, older ~20px
+    // Use 59 as safe default for modern iPhones
+    top = 59;
+  }
+  if (isStandalone && bottom === 0) {
+    // Home indicator bar ~34px
+    bottom = 34;
+  }
+  return { top, bottom };
 }
 
 function resize() {
@@ -130,12 +141,13 @@ function resize() {
   canvas.height = H * dpr;
   canvas.style.width = W + "px";
   canvas.style.height = H + "px";
-  CONTAINER_BOTTOM_MARGIN = Math.max(14, getSafeAreaBottom() + 8);
-  // Leave room for score/next-fruit UI: safe area top + UI height + gap
-  const topInset = getSafeAreaTop();
-  CONTAINER_TOP = topInset + 52;
-  DROP_Y = CONTAINER_TOP - 20;
-  DANGER_Y = CONTAINER_TOP + 18;
+
+  const insets = getSafeInsets();
+  CONTAINER_BOTTOM_MARGIN = insets.bottom + 10;
+  // Container starts below: safe area + score UI (~40px) + gap
+  CONTAINER_TOP = insets.top + 48;
+  DROP_Y = CONTAINER_TOP - 18;
+  DANGER_Y = CONTAINER_TOP + 20;
 }
 resize();
 window.addEventListener("resize", resize);
